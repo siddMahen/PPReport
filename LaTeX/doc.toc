@@ -1,1 +1,9 @@
 \contentsline {section}{Introduction}{1}
+\contentsline {subsection}{\numberline {0.1}Terminology and Basic Concepts}{1}
+\contentsline {subsubsection}{\numberline {0.1.1}Alice and Bob}{1}
+\contentsline {subsubsection}{\numberline {0.1.2}Encryption and Decryption}{1}
+\contentsline {subsubsection}{\numberline {0.1.3}Ciphers and Keys}{2}
+\contentsline {subsubsection}{\numberline {0.1.4}Symmetric and Asymmetric Ciphers}{2}
+\contentsline {section}{\numberline {1}Substitution Ciphers}{3}
+\contentsline {section}{\numberline {2}Block Ciphers}{3}
+\contentsline {section}{\numberline {3}ECC - Elliptic Curve Cryptography}{3}

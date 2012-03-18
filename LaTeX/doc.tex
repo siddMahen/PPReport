@@ -1,34 +1,168 @@
 \documentclass[12pt, a4paper, draft]{report}
-\usepackage{mathtools}
+\usepackage{palatino}
+\usepackage{parskip}
+\usepackage[titles]{tocloft}
+\usepackage{amsmath}
 
 \begin{document}
 
 % -- Title --
 \title{An Exploration of Modern Cryptography}
-\author{Siddharth Mahendraker}
+\author{Siddharth\\
+        Mahendraker}
 \maketitle
 
 % -- Abstract --
 \begin{abstract}
-Cras justo odio, dapibus ac facilisis in,
-egestas eget quam. Etiam porta sem malesuada magna mollis euismod.
-Curabitur blandit tempus porttitor. Duis mollis, est non commodo
-luctus, nisi erat porttitor ligula, eget lacinia odio sem nec
-elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.
-Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor.
-Nullam quis risus eget urna mollis ornare vel eu leo.
+Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh,
+ut fermentum massa justo sit amet risus. Maecenas sed diam eget risus
+varius blandit sit amet non magna. Duis mollis, est non commodo luctus,
+nisi erat porttitor ligula, eget lacinia odio sem nec elit. Vivamus
+sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Aenean
+eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum.
+Nulla vitae elit libero, a pharetra augue. Donec id elit non mi porta
+gravida at eget metus.
 \end{abstract}
+
+% -- Bookeeping
+\setcounter{secnumdepth}{3}
+%\setcounter{tocdepth}{3}
+\renewcommand*\thesection{\arabic{section}}
+\renewcommand{\cftsecfont}{\bfseries}
 
 % -- ToC --
 \setcounter{page}{1}
 \pagenumbering{roman}
 \tableofcontents
 \clearpage
-
-% -- Intro --
-\section*{Introduction}
 \addcontentsline{toc}{section}{Introduction}
 \setcounter{page}{1}
 \pagenumbering{arabic}
+
+% -- Intro --
+\section*{Introduction}
+
+Suppose two people, Alice and Bob, wish to communicate by mail and do not
+want their mailwoman, Eve, to be able to read their messages. Alice and Bob
+are military personal of the same country, but they have never met each
+other before. Because Eve is the mailwoman, she will be able to read
+all of the messages passing between Alice and Bob, but her obligation to
+the postal service prevents her from tampering with these
+messages\footnotemark.
+
+\footnotetext[1]{ In reality, Eve would not be bound by such a petty
+obligation, however, for the sake of simplicity, let us assume this is
+true. }
+
+The question is, is it possible for Alice and Bob to communicate securly
+in these circumstances? Astoundingly, the answer is yes!
+
+Cryptography is the science of securly sending messages over insecure
+channels. Using cryptographic techniques, Alice and Bob can be sure that
+their communications are illegible to Eve.
+
+\subsection{Terminology and Basic Concepts}
+
+\subsubsection{Alice and Bob}
+
+Unless specified otherwise, Alice and Bob are two parties attempting to
+communicate over an insecure channel, and Eve is their adversary trying to
+read their messages.
+
+\subsubsection{Encryption and Decryption}
+
+Messages in cryptography are formally called plaintext. When messages are
+scrambled, or made "illegible", they are encrypted. The encrypted form
+of these messages is called ciphertext. The reverse process of encryption,
+decryption, accepts ciphertext as input and returns plaintext. We can
+describe this mathematically as:
+\begin{align*}
+    E(M) & = C\\
+    E'(C) & = D(C) = M
+\end{align*}
+Where $M$ denotes plaintext, $C$ denotes cipher text, $E$ is the encryption
+function and $D$ is the decryption function, or the inverse of $E$. Also
+note the following identity:
+\begin{align*}
+    D(E(M)) & = M\\
+    E(D(C)) & = C
+\end{align*}
+
+\subsubsection{Ciphers and Keys}
+
+A cryptographic algorithm, or cipher, is a function used for encryption
+and decryption.
+
+If the workings of a cipher are made public, then the messages
+of anyone who is known to use the cipher can quickly be comprimised
+by simply implementing an inverse of the cipher. Therefore, cryptographers
+introduced a key. A key is a piece of secret, private information
+upon which the cipher depends. It often takes the form of a number.
+The total number of possible values a key can take on is called they
+keyspace. Because ciphers depend on the key to encrypt and decrypt
+plaintext, encryption and decryption is often denoted:
+\begin{align*}
+    E_K(P) & = C\\
+    D_K(C) & = P
+\end{align*}
+The key is denoted by $K$ and the keyspace is by $\mathcal{K}$. Note that
+the identity mentioned in 0.1.2 still holds true for ciphers.
+
+\subsubsection{Symmetric and Asymmetric Ciphers}
+
+There are two distict kinds of ciphers, symmetric ciphers and public-key
+(or asymmetric) ciphers.
+
+Symmetric ciphers are ciphers for which the key used to decrypt ciphertext
+and encrypt plaintext is the same. In most symmetric ciphers, this means
+that Alice and Bob will need to agree on a key before they can begin
+sending messages. Symmetric ciphers can be further categorized as stream
+ciphers or block ciphers. Stream ciphers operate on only one bit (or byte)
+of plaintext at a time, where as block ciphers operate on a large number
+of bytes at once.
+
+Public-key ciphers are ciphers for which the the key used for encrypting
+plaintext is different from the the key used for decrypting ciphertext.
+Further, these keys should be independant of each other, meaning the
+decryption key can not be calculated\footnotemark from the encryption key.
+The design of this cipher is such that the ecryption key can be published
+for anyone to use, but only the owner of the decryption key can decrypt
+the message. This is why is encryption key is referred to as the public
+key and the decryption key is referred to as the private key.
+
+\footnotetext[2]{ In a reasonably amount of time ofcourse. }
+
+
+
+% -- More stuff will be introduced as needed...
+% -- Explain cryptosystem and sym/asym
+
+% --Caesar Cipher--
+\section{Substitution Ciphers}
+
+% -- Explain what a substitution cipher is
+
+A substitution cipher is a cipher which
+
+The first cipher we will be analyzing is a substitution cipher called
+the Caesar cipher. In ancient times the Caesar cipher was used by Caesar
+and his generals to pass along messages on the battle field. Originally,
+the cipher shifted it's input 3 characters to the right. Therefore, text
+such as:
+
+\texttt{the quick brown fox jumped over the lazy dog}
+
+becomes
+
+\texttt{wkh txlfn eurzq ira mxpsv ryhu wkh odcb grj}.
+
+Although this looks complex, the flaws in this cipher will soon be all
+too aparent.
+
+%--Block Cipher--
+\section{Block Ciphers}
+
+%--ECC--
+\section{ECC - Elliptic Curve Cryptography}
 
 \end{document}

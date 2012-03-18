@@ -1,0 +1,4 @@
+LaTeX/*.log
+LaTeX/*.dvi
+LaTeX/*.aux
+LaTeX/*.toc
