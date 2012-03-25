@@ -3,6 +3,8 @@
 \usepackage{parskip}
 \usepackage[titles]{tocloft}
 \usepackage{amsmath}
+\usepackage{alltt}
+\usepackage{algpseudocode}
 
 \begin{document}
 
@@ -64,7 +66,6 @@ their communications are illegible to Eve.
 \subsection{Terminology and Basic Concepts}
 
 \subsubsection{Alice and Bob}
-
 Unless specified otherwise, Alice and Bob are two parties attempting to
 communicate over an insecure channel, and Eve is their adversary trying to
 read their messages.
@@ -72,7 +73,7 @@ read their messages.
 \subsubsection{Encryption and Decryption}
 
 Messages in cryptography are formally called plaintext. When messages are
-scrambled, or made "illegible", they are encrypted. The encrypted form
+scrambled, or made ``illegible'', they are encrypted. The encrypted form
 of these messages is called ciphertext. The reverse process of encryption,
 decryption, accepts ciphertext as input and returns plaintext. We can
 describe this mathematically as:
@@ -132,32 +133,245 @@ key and the decryption key is referred to as the private key.
 
 \footnotetext[2]{ In a reasonably amount of time ofcourse. }
 
+\subsubsection{Cryptanalysis}
 
+Crytanalysis is the study of obtaining the plaintext from encrypted
+messages without the knowledge of the key. An attempt to cryptanalyse
+a cipher is called an attack. Succeful attacks often reveal either the
+plaintext, the secret key, or both.
 
+The only assumption made in cryptanalysis is that the only piece of
+information the users of the cipher, Alice and Bob know that the adversary
+Eve does not is the secret key. This means that all other information,
+including communications and the workings of their cryptographic algorithm
+are available to anyone. This assumption implies that the security of
+the algorithm rests only in the key, and nothing else.
+
+There are three main cryptanalysis techniques we will be focusing on in
+this report. Listed in decreasing order of difficulty they are; ciphertext
+only attacks, known-plaintext attacks and chosen plaintext attacks.
+
+In ciphertext only attacks, the cryptanalyst (or attacker) Eve has access
+to several different ciphertexts. The attack is considered succesful if
+Eve succesfully retrieves the plaintexts corresponding to the ciphertexts
+or the key used in encryption.
+
+In known-plaintext attacks, Eve has access to the ciphertexts as well
+as their corresponding plaintexts. The attack is succesful if Eve
+finds the key (or keys) used to encrypt each plaintext.
+
+In chosen plaintext attacks, Eve can not only access the ciphertexts,
+and their corresponding plaintext, but can also choose which plaintexts
+are encrypted and which are decrypted. The attack is succesful if Eve
+retrieves the key (or keys) used to encrypt each plaintext.
+
+Note that in all of the cases above, the adversary, Eve, had to know
+some amount of ``information'' about the ciphertext, plaintext or the
+relationship between the two. The only other technique which can yield
+the key is a brute force attack or exhaustive search attack, in which
+Eve checks the ciphertext against all possible keys in the keyspace until
+one of the keys reveals the plaintext.
+
+% -- Perhaps explain how ciphers can be broken, ergo kinds of attacks
+% -- Perhaps talk about keyspace, ciphertext space and plaintext space?
 % -- More stuff will be introduced as needed...
-% -- Explain cryptosystem and sym/asym
 
 % --Caesar Cipher--
 \section{Substitution Ciphers}
 
 % -- Explain what a substitution cipher is
 
-A substitution cipher is a cipher which
+A substitution cipher is a cipher in which each character or byte in the
+plaintext is substituted with a character or byte in the cipher text.
 
-The first cipher we will be analyzing is a substitution cipher called
-the Caesar cipher. In ancient times the Caesar cipher was used by Caesar
-and his generals to pass along messages on the battle field. Originally,
-the cipher shifted it's input 3 characters to the right. Therefore, text
-such as:
+This can be seen mathematically as:
+\begin{align*}
+    m & = fromChar(i)\\
+    m + k & = n\\
+    c & = toChar(n)
+\end{align*}
+Decryption works the other way around. An already shifted character, $i$,
+is tranformed into it's interger representation, $m$, from which the key
+is subtracted to yield the interger $n$, which is finally transformed back
+into the plaintext.
+\begin{align*}
+    m & = fromChar(i)\\
+    m - k & = n\\
+    p & = toChar(n)
+\end{align*}
+This can be more concesily explained in pseudocode:
 
-\texttt{the quick brown fox jumped over the lazy dog}
+% -- Show pseudo code here
 
-becomes
+\subsection{Information Theory and Languages}
 
-\texttt{wkh txlfn eurzq ira mxpsv ryhu wkh odcb grj}.
+Before we begin a deconstruction of the Caesar cipher, there are a few
+assumptions we make that must be explained.
 
-Although this looks complex, the flaws in this cipher will soon be all
-too aparent.
+Firstly, we must clarify the definition of information we used in section
+0.X.X. Information can be rigourouly defined as the least number of bits
+it would take to represent all possible meanings of a message, assuming
+all messages are equally likely.
+
+For example, suppose we are trying to determine the amount of information
+in a list of possible sexes:
+
+\begin{center}
+\begin{verbatim}
+1. Male
+2. Female
+\end{verbatim}
+\end{center}
+
+Clearly, this data can be represented using one bit, where the 1
+represents male and 0 represents female. Therefore, we can say that there
+is only one bit of information present in this list.
+
+Now, if we take a look at words used in the English language, we clearly
+see that English does not represent this information very succintly, e.i
+there is lots of redundance per character.
+
+For example, the sentance ``met u tmrw @ 9'' conveys the same information
+as the sentance ``meet you tomorrow at nine'', yet does do much more
+succintly. Therefore, we could say that many of the character in the
+latter sentance are redundant or useless.
+
+Although this may not seem related at all to cryptography, it is. This
+redundancy in languages causes sentances to ``leak'' more information than
+they need to. As we shall soon see, this often manifests itself as
+discrepancies in the frequency and location of certain characters in
+relation to others, and makes breaking the Caesar cipher a piece of
+cake.
+
+% -- I should create footnotes where you can read more about
+% -- these subjects, because my explanations are less than adequate
+
+\subsection{Cryptanalysis of the Caesar Cipher}
+
+If we take the most naïve cryptanalytic approache, a brute force attack,
+the Caesar cipher appears quite strong. Indeed the keyspace of the cipher
+is $26!$ or approximately $4 \times 10^{26}$! This means that even if we
+were to check even a million keys per second, it would still take us around
+$1.27 \times 10^{13}$ years to check every possible key! That longer than
+the estimated age of the universe!!
+
+However, we know from our understanding of redundancy in language that there
+is information being leaked here.
+
+Because the output of this algorithm mearely ``switches'' one letter with another,
+the letters in any particular ciphertext will continue to follow the known
+statistic rules regarding English text. Particularly, they will maintain certain
+distributions of characters, bi-grams and tri-grams over the message.
+
+\begin{table}
+\begin{tabular}{| c | c |}
+    \hline
+    \multicolumn{2}{| c |}{By decreasing frequency} \\
+    \hline
+    E & 13.11\% \\
+    T & 10.47\% \\
+    A & 8.15\% \\
+    O & 8.05\% \\
+    N & 7.15\% \\
+    R & 6.85\% \\
+    I & 6.35\% \\
+    S & 6.15\% \\
+    H & 5.25\% \\
+    D & 3.75\% \\
+    L & 3.35\% \\
+    F & 2.95\% \\
+    C & 2.75\% \\
+    M & 2.55\% \\
+    U & 2.45\% \\
+    G & 1.95\% \\
+    Y & 1.95\% \\
+    P & 1.95\% \\
+    W & 1.55\% \\
+    B & 1.45\% \\
+    V & 0.95\% \\
+    K & 0.45\% \\
+    X & 0.15\% \\
+    J & 0.15\% \\
+    Q & 0.15\% \\
+    Z & 0.05\% \\
+    \hline
+\end{tabular}
+\end{table}
+
+% -- Also include tables with bi-grams and tri-grams
+
+Therefore, if we are given the following ciphertext:
+
+% -- TODO: remember that for alltt blocks, lines should
+% --       end around 53~
+
+\begin{alltt}
+ofobiyxocryevnkvcyexnobcdkxndrovswsdkdsyxcypmbizdyqbkz
+rikckdyyvgroxeconsxmyxtexmdsyxgsdrcyvsnzbyqbkwwsxqzbkm
+dsmockxnpsbwwkdrowkdsmkvmyxtomdebocsdmkxlorsqrvioppomd
+sforygofobspwscecondrobowkilonsckcdobyecmyxcoaeoxmocsx
+mvensxqwkccnkdkdropdybcobfobrsqrtkmusxq
+\end{alltt}
+
+We would first construct a table of the character present in the text and
+their respective frequencies, as so:
+
+% -- Freq. Table
+
+Then we would map the most frequent characters to each other.
+Clearly, the character ``o'' appears to represent the character ``e''.
+Based on our knowledge of the algorithm, we know the key is used as
+a shift for the integer values of each character. A quick glance at the
+ASCII character table reveals that e = 101 and o = 111 as integers.
+Therefore, we can conclude that the key used to encrypt this plaintext
+is the number 10.
+
+A quick check reveals that we were indeed correct.
+
+\begin{alltt}
+everyoneshouldalsounderstandthelimitationsofcryptograp
+hyasatoolwhenusedinconjunctionwithsolidprogrammingprac
+ticesandfirmmathematicalconjecturesitcanbehighlyeffect
+ivehoweverifmisusedtheremaybedisasterousconsequencesin
+cludingmassdatatheftorserverhighjacking
+\end{alltt}
+
+With proper punctuation and capitalization the plaintext becomes:
+
+\begin{alltt}
+Everyone should also understand the limitations of cry
+ptography as a tool. When used in conjunction with sol
+id programming practices and firm mathematical conject
+ures, it can be highly effective. However, if misused,
+there may be disasterous consequences, including mass
+data theft or server highjacking.
+\end{alltt}
+
+\subsection{Advantages and Disadvantages of the Caesar Cipher}
+
+At this point, you may be asking yourself why the Caesar cipher would
+ever be considered a viable method of encrpyting data, considering we
+have been able to break it quite easily using a ciphertext only attack.
+
+Although this cipher is very deeply flawed, it still has certain
+advantages which make it practical in certain situations.
+
+For example, if speed and memory are your main concerns, and your
+plaintext only has to be superficially secure, then this cipher is one
+of your best options. The Caesar cipher has a time complexity of
+$\Theta(1)$ and a memory complexity of $\Theta(1)$. This means that
+the cipher's speed and memory usage stay within a constant range, and
+do not grow (or shrink) in relation to the size of the cipher's input.
+This is because the cipher operates on only one character (or byte) at
+a time, and performs the same constant time operation on each byte.
+
+Furthermore, the Ceasar cipher may also be practical in situations where
+only a small amount of plaintext is being encrpyted. The statistical
+analysis which was used is only relevant to plaintexts of sufficient
+length. It has been shown that highly competent cryptanalysts can break
+the Caesar cipher using only 25 English characters of plaintext.
+Therefore, the Caesar cipher might be practical for messages shorter than
+25 characters.
 
 %--Block Cipher--
 \section{Block Ciphers}
