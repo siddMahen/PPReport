@@ -4,7 +4,7 @@
 \usepackage[titles]{tocloft}
 \usepackage{amsmath}
 \usepackage{alltt}
-\usepackage{algpseudocode}
+\usepackage{booktabs}
 
 \begin{document}
 
@@ -56,10 +56,10 @@ messages\footnotemark.
 obligation, however, for the sake of simplicity, let us assume this is
 true. }
 
-The question is, is it possible for Alice and Bob to communicate securly
+The question is, is it possible for Alice and Bob to communicate securely
 in these circumstances? Astoundingly, the answer is yes!
 
-Cryptography is the science of securly sending messages over insecure
+Cryptography is the science of securely sending messages over insecure
 channels. Using cryptographic techniques, Alice and Bob can be sure that
 their communications are illegible to Eve.
 
@@ -109,9 +109,9 @@ plaintext, encryption and decryption is often denoted:
 The key is denoted by $K$ and the keyspace is by $\mathcal{K}$. Note that
 the identity mentioned in 0.1.2 still holds true for ciphers.
 
-\subsubsection{Symmetric and Asymmetric Ciphers}
+\subsubsection{Symmetric and Public-Key Ciphers}
 
-There are two distict kinds of ciphers, symmetric ciphers and public-key
+There are two distinct kinds of ciphers, symmetric ciphers and public-key
 (or asymmetric) ciphers.
 
 Symmetric ciphers are ciphers for which the key used to decrypt ciphertext
@@ -124,9 +124,9 @@ of bytes at once.
 
 Public-key ciphers are ciphers for which the the key used for encrypting
 plaintext is different from the the key used for decrypting ciphertext.
-Further, these keys should be independant of each other, meaning the
+Further, these keys should be independent of each other, meaning the
 decryption key can not be calculated\footnotemark from the encryption key.
-The design of this cipher is such that the ecryption key can be published
+The design of this cipher is such that the encryption key can be published
 for anyone to use, but only the owner of the decryption key can decrypt
 the message. This is why is encryption key is referred to as the public
 key and the decryption key is referred to as the private key.
@@ -137,7 +137,7 @@ key and the decryption key is referred to as the private key.
 
 Crytanalysis is the study of obtaining the plaintext from encrypted
 messages without the knowledge of the key. An attempt to cryptanalyse
-a cipher is called an attack. Succeful attacks often reveal either the
+a cipher is called an attack. Successful attacks often reveal either the
 plaintext, the secret key, or both.
 
 The only assumption made in cryptanalysis is that the only piece of
@@ -152,17 +152,17 @@ this report. Listed in decreasing order of difficulty they are; ciphertext
 only attacks, known-plaintext attacks and chosen plaintext attacks.
 
 In ciphertext only attacks, the cryptanalyst (or attacker) Eve has access
-to several different ciphertexts. The attack is considered succesful if
-Eve succesfully retrieves the plaintexts corresponding to the ciphertexts
+to several different ciphertexts. The attack is considered successful if
+Eve successfully retrieves the plaintexts corresponding to the ciphertexts
 or the key used in encryption.
 
 In known-plaintext attacks, Eve has access to the ciphertexts as well
-as their corresponding plaintexts. The attack is succesful if Eve
+as their corresponding plaintexts. The attack is successful if Eve
 finds the key (or keys) used to encrypt each plaintext.
 
 In chosen plaintext attacks, Eve can not only access the ciphertexts,
 and their corresponding plaintext, but can also choose which plaintexts
-are encrypted and which are decrypted. The attack is succesful if Eve
+are encrypted and which are decrypted. The attack is successful if Eve
 retrieves the key (or keys) used to encrypt each plaintext.
 
 Note that in all of the cases above, the adversary, Eve, had to know
@@ -191,15 +191,15 @@ This can be seen mathematically as:
     c & = toChar(n)
 \end{align*}
 Decryption works the other way around. An already shifted character, $i$,
-is tranformed into it's interger representation, $m$, from which the key
-is subtracted to yield the interger $n$, which is finally transformed back
+is transformed into it's integer representation, $m$, from which the key
+is subtracted to yield the integer $n$, which is finally transformed back
 into the plaintext.
 \begin{align*}
     m & = fromChar(i)\\
     m - k & = n\\
     p & = toChar(n)
 \end{align*}
-This can be more concesily explained in pseudocode:
+This can be more concisely explained in pseudocode:
 
 % -- Show pseudo code here
 
@@ -209,7 +209,7 @@ Before we begin a deconstruction of the Caesar cipher, there are a few
 assumptions we make that must be explained.
 
 Firstly, we must clarify the definition of information we used in section
-0.X.X. Information can be rigourouly defined as the least number of bits
+0.X.X. Information can be rigorously defined as the least number of bits
 it would take to represent all possible meanings of a message, assuming
 all messages are equally likely.
 
@@ -217,10 +217,10 @@ For example, suppose we are trying to determine the amount of information
 in a list of possible sexes:
 
 \begin{center}
-\begin{verbatim}
+\begin{alltt}
 1. Male
 2. Female
-\end{verbatim}
+\end{alltt}
 \end{center}
 
 Clearly, this data can be represented using one bit, where the 1
@@ -231,13 +231,13 @@ Now, if we take a look at words used in the English language, we clearly
 see that English does not represent this information very succintly, e.i
 there is lots of redundance per character.
 
-For example, the sentance ``met u tmrw @ 9'' conveys the same information
-as the sentance ``meet you tomorrow at nine'', yet does do much more
-succintly. Therefore, we could say that many of the character in the
-latter sentance are redundant or useless.
+For example, the sentence ``met u tmrw @ 9'' conveys the same information
+as the sentence ``meet you tomorrow at nine'', yet does do much more
+succinctly. Therefore, we could say that many of the character in the
+latter sentence are redundant or useless.
 
 Although this may not seem related at all to cryptography, it is. This
-redundancy in languages causes sentances to ``leak'' more information than
+redundancy in languages causes sentences to ``leak'' more information than
 they need to. As we shall soon see, this often manifests itself as
 discrepancies in the frequency and location of certain characters in
 relation to others, and makes breaking the Caesar cipher a piece of
@@ -248,7 +248,7 @@ cake.
 
 \subsection{Cryptanalysis of the Caesar Cipher}
 
-If we take the most naïve cryptanalytic approache, a brute force attack,
+If we take the most naïve cryptanalytic approach, a brute force attack,
 the Caesar cipher appears quite strong. Indeed the keyspace of the cipher
 is $26!$ or approximately $4 \times 10^{26}$! This means that even if we
 were to check even a million keys per second, it would still take us around
@@ -258,48 +258,39 @@ the estimated age of the universe!!
 However, we know from our understanding of redundancy in language that there
 is information being leaked here.
 
-Because the output of this algorithm mearely ``switches'' one letter with another,
+Because the output of this algorithm merely ``switches'' one letter with another,
 the letters in any particular ciphertext will continue to follow the known
 statistic rules regarding English text. Particularly, they will maintain certain
 distributions of characters, bi-grams and tri-grams over the message.
 
-\begin{table}
-\begin{tabular}{| c | c |}
-    \hline
-    \multicolumn{2}{| c |}{By decreasing frequency} \\
-    \hline
-    E & 13.11\% \\
-    T & 10.47\% \\
-    A & 8.15\% \\
-    O & 8.05\% \\
-    N & 7.15\% \\
-    R & 6.85\% \\
-    I & 6.35\% \\
-    S & 6.15\% \\
-    H & 5.25\% \\
-    D & 3.75\% \\
-    L & 3.35\% \\
-    F & 2.95\% \\
-    C & 2.75\% \\
-    M & 2.55\% \\
-    U & 2.45\% \\
-    G & 1.95\% \\
-    Y & 1.95\% \\
-    P & 1.95\% \\
-    W & 1.55\% \\
-    B & 1.45\% \\
-    V & 0.95\% \\
-    K & 0.45\% \\
-    X & 0.15\% \\
-    J & 0.15\% \\
-    Q & 0.15\% \\
-    Z & 0.05\% \\
-    \hline
+\begin{figure}[h]
+\begin{center}
+\begin{tabular}{cccc}
+\toprule
+\multicolumn{4}{c}{Letter Frequency (\%)}\\
+\midrule
+E & 13.11 & M & 2.55\\
+T & 10.47 & U & 2.45\\
+A & 8.15  & G & 1.95\\
+O & 8.05  & Y & 1.95\\
+N & 7.15  & P & 1.96\\
+R & 6.85  & W & 1.55\\
+I & 6.35  & B & 1.45\\
+S & 6.15  & V & 0.95\\
+H & 5.25  & K & 0.45\\
+D & 3.75  & X & 0.15\\
+L & 3.35  & J & 0.15\\
+F & 2.95  & Q & 0.15\\
+C & 2.75  & Z & 0.05\\
+\bottomrule
 \end{tabular}
-\end{table}
+\end{center}
+\caption{General frequency of English characters in decreasing order}
+\end{figure}
 
 % -- Also include tables with bi-grams and tri-grams
 
+\pagebreak
 Therefore, if we are given the following ciphertext:
 
 % -- TODO: remember that for alltt blocks, lines should
@@ -316,6 +307,18 @@ mvensxqwkccnkdkdropdybcobfobrsqrtkmusxq
 We would first construct a table of the character present in the text and
 their respective frequencies, as so:
 
+\begin{figure}[h]
+\begin{center}
+\begin{tabular}{l*{26}{c}}
+\toprule
+Character & o & s & c & k & d & x & y & b & m & r & n & e & w & v & q & p & i & f & z & g & t & l & a & u\\
+\midrule
+Frequency & 28 & 21 & 19 & 19 & 19 & 18 & 17 & 15 & 14 & 13 & 10 & 9 & 9 & 8 & 7 & 6 & 5 & 4 & 4 & 3 & 3 & 2 & 1 & 1\\
+\bottomrule
+\end{tabular}
+\end{center}
+\caption{Frequency of English characters in the ciphertext}
+\end{figure}
 % -- Freq. Table
 
 Then we would map the most frequent characters to each other.
@@ -326,6 +329,7 @@ ASCII character table reveals that e = 101 and o = 111 as integers.
 Therefore, we can conclude that the key used to encrypt this plaintext
 is the number 10.
 
+\pagebreak
 A quick check reveals that we were indeed correct.
 
 \begin{alltt}
@@ -335,6 +339,10 @@ ticesandfirmmathematicalconjecturesitcanbehighlyeffect
 ivehoweverifmisusedtheremaybedisasterousconsequencesin
 cludingmassdatatheftorserverhighjacking
 \end{alltt}
+
+% -- Wow you made a mistake in the cipher text, gonna
+% -- need to fix this sometime... URGH: disastrous NOT
+% -- disasterous!!
 
 With proper punctuation and capitalization the plaintext becomes:
 
@@ -350,7 +358,7 @@ data theft or server highjacking.
 \subsection{Advantages and Disadvantages of the Caesar Cipher}
 
 At this point, you may be asking yourself why the Caesar cipher would
-ever be considered a viable method of encrpyting data, considering we
+ever be considered a viable method of encrypting data, considering we
 have been able to break it quite easily using a ciphertext only attack.
 
 Although this cipher is very deeply flawed, it still has certain
@@ -365,8 +373,8 @@ do not grow (or shrink) in relation to the size of the cipher's input.
 This is because the cipher operates on only one character (or byte) at
 a time, and performs the same constant time operation on each byte.
 
-Furthermore, the Ceasar cipher may also be practical in situations where
-only a small amount of plaintext is being encrpyted. The statistical
+Furthermore, the Caesar cipher may also be practical in situations where
+only a small amount of plaintext is being encrypted. The statistical
 analysis which was used is only relevant to plaintexts of sufficient
 length. It has been shown that highly competent cryptanalysts can break
 the Caesar cipher using only 25 English characters of plaintext.

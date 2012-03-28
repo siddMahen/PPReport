@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011) (format=pdflatex 2011.7.3)  26 MAR 2012 00:03
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011) (format=pdflatex 2011.7.3)  28 MAR 2012 22:37
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -141,28 +141,25 @@ LaTeX Info: Redefining \] on input line 2667.
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/alltt.sty
 Package: alltt 1997/06/16 v2.0g defines alltt environment
 )
-(/usr/local/texlive/2011/texmf-dist/tex/latex/algorithmicx/algpseudocode.sty
-Package: algpseudocode 
-
-(/usr/local/texlive/2011/texmf-dist/tex/latex/base/ifthen.sty
-Package: ifthen 2001/05/26 v1.1c Standard LaTeX ifthen package (DPC)
-)
-(/usr/local/texlive/2011/texmf-dist/tex/latex/algorithmicx/algorithmicx.sty
-Package: algorithmicx 2005/04/27 v1.2 Algorithmicx
-
-Document Style algorithmicx 1.2 - a greatly improved `algorithmic' style
-\c@ALG@line=\count102
-\c@ALG@rem=\count103
-\c@ALG@nested=\count104
-\ALG@tlm=\skip80
-\ALG@thistlm=\skip81
-\c@ALG@Lnr=\count105
-\c@ALG@blocknr=\count106
-\c@ALG@storecount=\count107
-\c@ALG@tmpcounter=\count108
-\ALG@tmplength=\skip82
-)
-Document Style - pseudocode environments for use with the `algorithmicx' style
+(/usr/local/texlive/2011/texmf-dist/tex/latex/booktabs/booktabs.sty
+Package: booktabs 2005/04/14 v1.61803 publication quality tables
+\heavyrulewidth=\dimen112
+\lightrulewidth=\dimen113
+\cmidrulewidth=\dimen114
+\belowrulesep=\dimen115
+\belowbottomsep=\dimen116
+\aboverulesep=\dimen117
+\abovetopsep=\dimen118
+\cmidrulesep=\dimen119
+\cmidrulekern=\dimen120
+\defaultaddspace=\dimen121
+\@cmidla=\count102
+\@cmidlb=\count103
+\@aboverulesep=\dimen122
+\@belowrulesep=\dimen123
+\@thisruleclass=\count104
+\@lastruleclass=\count105
+\@thisrulewidth=\dimen124
 ) (./doc.aux)
 \openout1 = `doc.aux'.
 
@@ -181,21 +178,20 @@ LaTeX Font Info:    ... okay on input line 9.
 LaTeX Font Info:    Try loading font information for OT1+ppl on input line 9.
  (/usr/local/texlive/2011/texmf-dist/tex/latex/psnfss/ot1ppl.fd
 File: ot1ppl.fd 2001/06/04 font definitions for OT1/ppl.
-)
-[1
+) [1
 
 {/usr/local/texlive/2011/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
 LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <12> not available
 (Font)              Font shape `OT1/ppl/b/n' tried instead on input line 18.
-
-[1]
+ [1]
 LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <24.88> not available
 (Font)              Font shape `OT1/ppl/b/n' tried instead on input line 38.
  (./doc.toc)
 \tf@toc=\write3
 \openout3 = `doc.toc'.
 
- [1
+
+[1
 
 ]
 LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <17.28> not available
@@ -207,22 +203,29 @@ LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <14.4> not available
 ] [2] [3]
 LaTeX Font Info:    Try loading font information for OT1+pcr on input line 220.
 
-
-(/usr/local/texlive/2011/texmf-dist/tex/latex/psnfss/ot1pcr.fd
+ (/usr/local/texlive/2011/texmf-dist/tex/latex/psnfss/ot1pcr.fd
 File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 ) [4]
 Missing character: There is no Ã in font pplr7t!
 Missing character: There is no ¯ in font pplr7t!
- [5]
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[5]
+Overfull \hbox (184.25883pt too wide) in paragraph at lines 312--319
+ [] |
+ []
+
 [6] [7] [8] (./doc.aux) ) 
 Here is how much of TeX's memory you used:
- 1733 strings out of 493633
- 22513 string characters out of 3143378
- 79751 words of memory out of 3000000
- 5045 multiletter control sequences out of 15000+200000
+ 1295 strings out of 493633
+ 16173 string characters out of 3143378
+ 71449 words of memory out of 3000000
+ 4613 multiletter control sequences out of 15000+200000
  20578 words of font info for 56 fonts, out of 3000000 for 9000
  831 hyphenation exceptions out of 8191
- 27i,8n,20p,245b,250s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 27i,8n,20p,213b,240s stack positions out of 5000i,500n,10000p,200000b,50000s
 {/usr/local/texlive/2011/texmf-dist/fonts/enc/dvips/ba
 se/8r.enc}</usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cm
 mi12.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmm
@@ -233,7 +236,7 @@ b></usr/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb
 /usr/local/texlive/2011/texmf-dist/fonts/type1/urw/courier/ucrr8a.pfb></usr/loc
 al/texlive/2011/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb></usr/local/texl
 ive/2011/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb>
-Output written on doc.pdf (11 pages, 120892 bytes).
+Output written on doc.pdf (11 pages, 120982 bytes).
 PDF statistics:
  77 PDF objects out of 1000 (max. 8388607)
  54 compressed objects within 1 object stream
