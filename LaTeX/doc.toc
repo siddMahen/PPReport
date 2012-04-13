@@ -10,4 +10,10 @@
 \contentsline {subsection}{\numberline {1.2}Cryptanalysis of the Caesar Cipher}{5}
 \contentsline {subsection}{\numberline {1.3}Advantages and Disadvantages of the Caesar Cipher}{7}
 \contentsline {section}{\numberline {2}Block Ciphers}{8}
-\contentsline {section}{\numberline {3}ECC - Elliptic Curve Cryptography}{8}
+\contentsline {subsection}{\numberline {2.1}Construction of Block Ciphers}{8}
+\contentsline {subsubsection}{\numberline {2.1.1}Feistel Networks}{8}
+\contentsline {subsubsection}{\numberline {2.1.2}S-Boxes and P-Boxes}{9}
+\contentsline {subsection}{\numberline {2.2}Linear Cryptanalysis}{10}
+\contentsline {subsection}{\numberline {2.3}Cryptanalysis of the GHOST Cipher}{11}
+\contentsline {subsection}{\numberline {2.4}Advantages and Disadvantages of the GHOST Cipher}{15}
+\contentsline {section}{\numberline {3}ECC - Elliptic Curve Cryptography}{15}

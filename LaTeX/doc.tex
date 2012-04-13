@@ -5,6 +5,11 @@
 \usepackage{amsmath}
 \usepackage{alltt}
 \usepackage{booktabs}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage{mathabx}
+\usepackage{multirow}
 
 \begin{document}
 
@@ -28,9 +33,9 @@ gravida at eget metus.
 
 % -- Bookeeping
 \setcounter{secnumdepth}{3}
-%\setcounter{tocdepth}{3}
 \renewcommand*\thesection{\arabic{section}}
 \renewcommand{\cftsecfont}{\bfseries}
+\newcommand{\ph}[1]{\phantom{#1}}
 
 % -- ToC --
 \setcounter{page}{1}
@@ -95,7 +100,7 @@ A cryptographic algorithm, or cipher, is a function used for encryption
 and decryption.
 
 If the workings of a cipher are made public, then the messages
-of anyone who is known to use the cipher can quickly be comprimised
+of anyone who is known to use the cipher can quickly be compromised
 by simply implementing an inverse of the cipher. Therefore, cryptographers
 introduced a key. A key is a piece of secret, private information
 upon which the cipher depends. It often takes the form of a number.
@@ -184,22 +189,28 @@ one of the keys reveals the plaintext.
 A substitution cipher is a cipher in which each character or byte in the
 plaintext is substituted with a character or byte in the cipher text.
 
-This can be seen mathematically as:
-\begin{align*}
-    m & = fromChar(i)\\
-    m + k & = n\\
-    c & = toChar(n)
-\end{align*}
-Decryption works the other way around. An already shifted character, $i$,
-is transformed into it's integer representation, $m$, from which the key
-is subtracted to yield the integer $n$, which is finally transformed back
-into the plaintext.
-\begin{align*}
-    m & = fromChar(i)\\
-    m - k & = n\\
-    p & = toChar(n)
-\end{align*}
-This can be more concisely explained in pseudocode:
+The substitution cipher we will be analyzing is called the Caesar cipher.
+The Caesar cipher operates on one byte (or character) of the plaintext at
+a time. Briefly, the value of the key is added to each byte of the
+plaintext. If this sum is a byte which does not corresponds to a
+character in the English alphabet, the sum is set modulo 26. Decryption
+works the opposite way. The value of the key is subtracted from each byte
+of the ciphertext. If the sum is not in the English alphabet, the sum
+is set modulo 26.
+
+This can be more concisely explained in pseudocode as:
+
+\begin{algorithm}
+\begin{algorithmic}
+    \State $i\gets getByte()$
+    \State $i\gets i + k$
+    \If {$i > 26$}
+        \State $i\gets i - 26$
+    \EndIf
+    \State \Return $i$
+\end{algorithmic}
+\caption{Caesar cipher}
+\end{algorithm}
 
 % -- Show pseudo code here
 
@@ -383,6 +394,361 @@ Therefore, the Caesar cipher might be practical for messages shorter than
 
 %--Block Cipher--
 \section{Block Ciphers}
+
+Block ciphers, unlike substitution ciphers, operate on several bytes at
+a time. This ensures that redundancies in the data are not easy
+to analyse using statistical methods.
+
+The two basic methods of obfuscating redundancies in plaintext
+messages are confusion and diffusion. Confusion obscures the relationship
+between the plaintext and the ciphertext. This can be most simply achieved
+through substitution, as was done in the Caesar cipher. Diffusion, on the
+other hand, disperses the redundancy in the plaintext over the ciphertext.
+A simple example of this is a permutation box, where the position of the
+input bits are swapped with each other.
+
+Substitution ciphers can only use confusion based techniques, whereas block
+ciphers are capable of using both confusion and diffusion based techniques.
+This is why modern block ciphers are generally more secure than modern
+substitution ciphers.
+
+% -- Perhaps this should go somewhere else?
+
+The block cipher we will be analyzing is a heavily modified version of the
+GHOST cipher used by the former Soviet Union as encryption standard. The
+cipher operates on 64 bits of input and accepts a 256 bit key.
+
+\begin{algorithm}
+\begin{algorithmic}
+    \State $b\gets getBlock()$
+    \State $i\gets i + k$
+    \If {$i > 26$}
+        \State $i\gets i - 26$
+    \EndIf
+    \State \Return $i$
+\end{algorithmic}
+\caption{GHOST cipher}
+\end{algorithm}
+
+\subsection{Construction of Block Ciphers}
+
+Before we begin the analysis of GHOST, let us briefly look at some important
+ideas behind the design and construction of block ciphers.
+
+\subsubsection{Feistel Networks}
+
+Most blocks ciphers, including this version of GHOST, are Feistel networks.
+In Feistel networks, the plaintext is divided into two separate halfs, the
+right half, $R$, and the left half, $L$. Encryption is performed by
+repeatedly iterating a function, $f$, over the plaintext, using a
+different subkey of $K$ each time:
+\begin{align*}
+    L_i & = R_{i - 1}\\
+    R_i & = L_i \oplus f(R_i, K_i)
+\end{align*}
+The wonderful property of this construction, is that decryption does not
+require $f$ to be invertible, it can be as complex as desired, so long as
+the input to each round can be reconstructed. This can be easily seen:
+\begin{align*}
+    L_{i - 1} \oplus f(R_i, K_i) \oplus f(R_i, K_i) & = L_{i - 1}
+\end{align*}
+Therefore, decryption is simply performing encryption with the subkeys in
+the opposite order.
+
+\subsubsection{S-Boxes and P-Boxes}
+
+The confusion and diffusion properties of block ciphers come from their
+substitution boxes and their permutation boxes, abbreviated to S-boxes
+and P-boxes respectively. S-boxes output a transformation of their input
+bits, while P-Boxes output a permutation of their input bits.
+
+% -- This should be a footnote
+Some ciphers do not have P-boxes, but rather permute the input or output
+bits in a different fashion. The GHOST cipher, for example uses an 11-bit
+left circular shift, rather than a proper permutation box.
+
+S-boxes are by far the most important part of most block ciphers because
+they are its only non-linear component. If the S-boxes were linear,
+(or close to linear) the entire cipher would just be one big linear
+transformation of bits, and hence trivially simple to break.
+
+Therefore, if these boxes are improperly designed, that is, they perform
+close to linear transformations of bits, the the security of the entire
+cipher can be compromised.
+
+As we shall soon see, if these boxes are improperly designed, their overarching
+cipher can be suceptible to attack.
+
+\subsection{Linear Cryptanalysis}
+
+Suppose you were given a random sequence of bits $X$ and another random
+sequence of bits $Y$. Then the probability that the linear expression,
+\begin{align}
+    a_1X_1 \oplus a_2X_2 \oplus \cdots \oplus a_nX_n \oplus
+    b_1Y_1 \oplus b_2Y_2 \oplus \cdots \oplus b_mY_m = 0
+\end{align}
+Is exactly $1/2$ when $\{a\}$ and $\{b\}$ are random sequences of bits.
+
+Now suppose that $X$ and $Y$ are the respective sequences of input and
+output bits of a substitution box. If the S-box is a good one, then
+for any random sequence $\{a\}$ and $\{b\}$, the probability of $(1)$
+being $0$ should be less than some $1/2 + \epsilon$, where $\epsilon$ is
+some negligibly small number. However, if there are certain combinations
+of $\{a\}$ and $\{b\}$ which result in a probability of obtaining $0$
+significantly greater or significantly less than $1/2$, then the S-box
+is said to be biased. The linear probability bias (or just bias), is the
+amount from which the probability of the linear expression deviates from
+$1/2$. When the bias is positive, the expression is said to be linear
+and when it is negative it is said to be affine.
+
+Linear cryptanalysis is a known-plaintext attack against block ciphers,
+which attempts to take advantage of highly probable or improbable linear
+expressions occurring at key points in the cipher, most importantly in
+S-boxes. The attack uses these linear expressions to approximate portions
+of the cipher (accurate to some non-negligible probability) and eventually
+obtain the key bits. In general, linear cryptanalysis does not reveal the
+entire key, but rather makes exhaustive search an option by finding several
+key bits.
+
+For example, suppose given a $4 \times 4$ S-box, every combination
+of the four input bits is inputed and every output is recorded.
+It is found that the XOR of the first and second bit of input and the
+fourth bit of the output is equal to $0$ exactly $12/16$ times.
+This can be stated as:
+\begin{align*}
+    X_1 \oplus X_2 \oplus Y_4 & = 0
+\end{align*}
+Or equivalently:
+\begin{align*}
+    X_1 \oplus X_2 = Y_4
+\end{align*}
+With a probability of $3/4$.
+
+Therefore, the probability bias of this expression is $3/4 - 1/2 = 1/4$.
+Now suppose that the input to this S-box is the plaintext, $P$, XOR'd with
+the key $K$. Then we know that $(P_1 \oplus K_1) \oplus (P_2 \oplus K_2) =
+V_4$, where $V$ is the vector of output bits, with a probability $3/4$.
+Now, if we fix values for the bits $K_1$, $K_2$, and then XOR these
+hypothesized values with the output, we obtain our original plaintext bits.
+\begin{align*}
+    P_1 \oplus K_1 \oplus P_2 \oplus K_2 \oplus K_1 \oplus K_2 = V_4
+    \oplus K_1 \oplus K_2\\
+    P_1 \oplus P_2 = V_4 \oplus K_1 \oplus K_2
+\end{align*}
+If we try each combination of $K_1$ and $K_2$ over several
+plaintext ciphertext pairs, we will see one pair of $K_1$ and $K_2$ which
+when added give us the plaintext bits most often, ergo with the highest
+probability. These values are the values of the first and second bits of
+the key. The rest of the key can then be acquired by exhaustive search of
+the remaining key bits.
+
+In this example, the savings were quite trivial because the keyspace was only
+$2^4$, however, in larger keyspaces, the advantages become more significant.
+
+\subsection{Cryptanalysis of the GHOST Cipher}
+
+Now that we know how linear cryptanalysis works, we can begin analyzing the
+GHOST cipher. The GHOST cipher is a 8 round Feistel network which uses a
+different S-box for each round. During the round, the subkey corresponding
+to that round is XOR'd with the input and that is then circularly left shifted
+11 bits.
+
+Each S-box is a $4 \times 4$ S-box, meaning it accepts $4$ input bits and $4$
+output bits. The first S-box, for example looks like this:
+\begin{figure}[h]
+\begin{center}
+\begin{tabular}{l*{16}{c}}
+\toprule
+Input (hex) & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & A & B & C & D & E & F\\
+\midrule
+Ouput (hex) & 4 & A & 9 & 2 & D & 8 & 0 & E & 6 & B & 1 & C & 7 & F & 5 & 3\\
+\bottomrule
+\end{tabular}
+\end{center}
+\caption{Substitution Box 1}
+\end{figure}
+
+To figure out which linear expressions (if any) have high or low biases, we need
+to test every combination of input bits and output bits for each S-box, and
+find out which match the most or least often. That is, we need to evaluate
+\begin{align*}
+    a_1X_1 \oplus a_2X_2 \oplus a_3X_3 \oplus a_4X_4 \oplus
+    b_1Y_1 \oplus b_2Y_2 \oplus b_3Y_3 \oplus b_4Y_4 = 0
+\end{align*}
+Or equivalently,
+\begin{align*}
+    a_1X_1 \oplus a_2X_2 \oplus a_3X_3 \oplus a_4X_4 =
+    b_1Y_1 \oplus b_2Y_2 \oplus b_3Y_3 \oplus b_4Y_4
+\end{align*}
+For every possible combination of $a_i = \{0, 1\}$ and $b_j = \{0, 1\}$.
+
+\begin{figure}[h]
+\begin{center}
+\begin{tabular}{c|*{16}{c}}
+$\oplus$& 0& 1& 2& 3& 4& 5& 6& 7& 8& 9& A& B& C& D& E& F\\
+\midrule
+0& 8& 0& 0& 0& 0& 0& 0& 0& 0& 0& 0& 0& 0& 0& 0& 0\\
+1& 0&-2& 4&-2&-2& 0& 2& 0& 4& 2& 0& 2&-2& 0& 2& 0\\
+2& 0& 0&-2& 2&-2& 2& 0& 0&-2& 2& 0& 0&-4&-4& 2&-2\\
+3& 0& 2&-2& 0&-4&-2&-2& 0& 2& 0&-4& 2& 2& 0& 0&-2\\
+4& 0& 2& 0&-2& 2&-4&-2&-4& 0& 2& 0&-2&-2& 0& 2& 0\\
+5& 0& 0& 0& 0& 0&-4& 4& 0& 0& 0& 0& 0& 0&-4&-4& 0\\
+6& 0& 2&-2& 0& 0&-2&-2& 4& 2& 0& 4& 2&-2& 0& 0& 2\\
+7& 0& 4& 2& 2&-2& 2& 0& 0& 2& 2& 0&-4& 0& 0&-2& 2\\
+8& 0& 4& 2&-2& 2& 2& 0& 0&-2& 2& 0& 4& 0& 0&-2&-2\\
+9& 0&-2& 2& 4& 0&-2&-2& 0&-2& 4& 0& 2& 2& 0& 0& 2\\
+A& 0& 0& 4& 0& 0& 0&-4& 0& 0&-4& 0& 0& 0&-4& 0& 0\\
+B& 0&-2& 0&-2&-2& 0&-2& 0& 0& 2& 4&-2& 2& 0&-2&-4\\
+C& 0&-2&-2& 0& 0& 2&-2&-4& 2& 0& 0& 2&-2& 0&-4& 2\\
+D& 0& 0& 2& 2&-2&-2& 0& 0&-2&-2& 0& 0&-4& 4&-2&-2\\
+E& 0& 2& 0& 2&-2& 0& 2&-4& 0&-2& 4& 2& 2& 0& 2& 0\\
+F& 0& 0& 0& 4& 4& 0& 0& 0& 4& 0& 0& 0& 0& 0& 0&-4\\
+\end{tabular}
+\end{center}
+\caption{Linear approximation table for S-box 1}
+\end{figure}
+
+This can be done using a linear approximation table. The table shows us the
+bias of each combination of input and output bits for the S-box. The input
+and output hex values represent the values of sequences $a_i$ and $b_j$
+respectively from right to left. For example, the bias at row \texttt{A},
+column \texttt{2} represents the bias of the combination
+\begin{align*}
+    (1)X_1 \oplus (0)X_2 \oplus (1)X_3 \oplus (0)X_4 =
+    (0)Y_1 \oplus (0)Y_2 \oplus (1)Y_3 \oplus (0)Y_4
+\end{align*}
+Or more succinctly,
+\begin{align*}
+    X_1 \oplus X_3 = Y_3
+\end{align*}
+As $\texttt{A} = 1010, \texttt{2} = 0010$ in hex.
+
+By analyzing each S-box, and the way the output of each S-box moves across
+different S-boxes after each round, we can identify particular chains of
+linear expressions which will allow us to approximate rounds of the cipher.
+
+Let $U_{i,j}$ and $V_{i,j}$ represents the input and output of the $i$-th round, at
+the $j$-th bit, (where the bits are numbered from left to right, 1 to 32). Further,
+let $K_{i,j}$ denote the subkey $i$ of the key $K$ at the $j$-th bit.
+
+Let us begin with the following linear expression which approximates the first round of
+the cipher with the probability $3/4$.
+\begin{align*}
+    V_{1,3} \oplus V_{1,4} &= U_{1,1} \oplus U_{1,2} \oplus U_{1,3} \oplus U_{1,4}\\
+    &= (P_1 \oplus K_{1,1}) \oplus (P_2 \oplus K_{1,2}) \oplus (P_3 \oplus K_{1,3})
+    \oplus (P_4 \oplus K_{1,4})
+\end{align*}
+Note that each S-box maps to a certain range in the output. S-box 1 works for the first
+four bits, ($U_{i,1} - U_{i,4}$), S-box 2 for the next four ($U_{i,5} - U_{i,8}$) and so
+forth. Therefore, certain expressions, such as the one above, use only one S-box
+transformation, as all of the bits belong to one S-box, whereas others use several S-boxes
+are hence may have different expansions as well as different probabilities.
+
+We then circularly left shift the output 11 bits, and expand $V_{1,3}
+\oplus V_{1,4}$. We find that
+\begin{align*}
+    U_{2,24} \oplus U_{2,25} = V_{1,3} \oplus V_{1,4} \oplus K_{2,24} \oplus K_{2,25}
+    = V_{2,22} \oplus V_{2,23} \oplus V_{2,24} \oplus V_{2,28}
+\end{align*}
+Is true with a probability of $1/2 + 2^2(3/4)(-1/4)(-6/16)$.
+
+Now we expand $V_{2,22} \oplus V_{2,23} \oplus V_{2,24} \oplus V_{2,28}$, once again
+after the circular left shift:
+\begin{align*}
+    U_{3,11} \oplus U_{3,12} \oplus U_{3,13} \oplus U_{3,17} =\\
+    V_{2,22} \oplus V_{2,23} \oplus V_{2,24} \oplus V_{2,28} \oplus K_{3,11}
+    \oplus K_{3,12} \oplus K_{3,13} \oplus K_{3,17}
+\end{align*}
+
+These expansions of the output of the S-boxes continues until we reach the output of
+the seventh S-box. This final expression gives us the approximation of the first seven
+rounds of the cipher:
+\begin{align*}
+    P_1 \oplus P_2 \oplus P_3 \oplus P_4 \oplus V_{7,3} \oplus V_{7,6} \oplus V_{7,10}
+    \oplus V_{7,25} \oplus V_{7,31} \oplus V_{7,32} \oplus \Sigma_K= 0
+\end{align*}
+Or alternatively:
+\begin{align*}
+    P_1 \oplus P_2 \oplus P_3 \oplus P_4 \oplus U_{8,14} \oplus U_{8,20} \oplus
+    U_{8,21} \oplus U_{8,24} \oplus U_{8,27} \oplus U_{8,31} \oplus \Sigma_K = 0
+\end{align*}
+Where $\Sigma_K$ is the XOR of all the keys picked up along the expansion.
+
+Based on the piling up principle, this expression holds with a probability of
+\begin{align*}
+1/2 + 2^{23-1}(-1/4)^12(1/4)^8(-6/16)(6/16)(5/16)
+\end{align*}
+or approximately $0.499999832362$ if $\Sigma_K = 0$ and $0.500000167638$ if
+$\Sigma_K = 1$. Although this may seem small, it is actually non-negligible
+in cryptography.
+
+Because the final input bits are divided into 6 different S-boxes, each of which has
+a 4 bit input, the total number of bits of subkeys we will have to check by exhaustive
+search is $2^{6 \cdot 4} = 2^24$. One of these keys will match our expression the best,
+and that will give us 24 bits of the last subkey. Although this is not nearly enough
+to break the entire cipher, it shows that the cipher is certainly breakable, as these
+procedures can be repeated with other linear expression chains and the last 8 bits of the
+subkey can be quite easily retrieved. Then each of the previous subkeys can be analyzed
+in a similar fashion. Finally, we may retrieve either enough key bits to perform a brute
+force search, or find the entire key itself.
+
+Theoretically, this cipher is quite broken, however, in practice an attack on the scale
+of what I have just proposed is often infeasible. Based on Matsui's research, the number
+of plaintexts required to perform this attack is approximately
+\begin{align*}
+    N_L \approx \frac{1}{\epsilon^2}
+\end{align*}
+Where $\epsilon$ is the bias of our linear expression and $N_L$ is the number of
+plaintexts required to perform the linear cryptanalysis attack.
+
+In this case, this means that our cipher would require approximately $3.55 \times 10^{13}$
+plaintext ciphertext pairs, just to recover 24 bits of the key. Since each pair is
+$2 \times 64$ bits of data, the total number of memory needed to store this data would be
+approximately 520 terabytes. Although this large an amount of data storage is not impossible
+to obtain, it is very expensive and costly to operate.
+
+Note however, that additional memory need not be purchased to perform subsequent linear
+cryptanalytic attacks, and therefore this is only an upfront cost. After discovering the
+entire 8-th subkey, the number of plaintexts required to obtain meaningful results will only
+become small, as there are fewer and fewer biases to account for (everything past the
+seventh S-box is now completely linear).
+
+\subsection{Advantages and Disadvantages of the GHOST Cipher}
+
+% -- TODO: Ammend sub cipher dis/adv to include having to share the key
+
+Clearly, one of the biggest disadvantages of the GHOST cipher (and for that matter most
+block ciphers) is that the entire cipher relies on the security of the S-boxes and their
+construction. A good S-box must have good diffusive properties while still being resistant
+to linear cryptanalysis and other forms of attack (such as differential cryptanalysis).
+Finding better S-boxes, however is a very difficult task, and there is still much debate
+in the scientific community regarding how it should be done. It is known that larger S-boxes
+are stronger than smaller ones, however, these large tables increase the size of these
+alogrithms considerably. Furthermore, current mathematical techniques can only create
+S-boxes which are secure against current attacks, whereas randomly selected S-boxes with
+adequate properties may be more secure against future attacks.
+
+Furthermore, the GHOST cipher (and block ciphers in general) are quite slow in comparison to
+other kinds of ciphers. For example, on my personal machine, running the modified GHOST
+cipher took 1192 milliseconds on one run, whereas running the substitution cipher from the
+previous chapter took only 6 milliseconds! Therefore, is speed takes precedence over
+security, GHOST (and for that matter block ciphers in general) may not be the best choice.
+
+However, GHOST does have some great benefits. Cryptographically, it is considerably
+stronger than the substitution cipher we examined in the previous chapter. It is also
+very simple to implement in software, as it deals mainly with large chunks of data rather
+than individual bits.
+
+Lastly, although the parameters set for such an attack seem outrageous and infeasible
+for any normal person, this cipher will be easily broken by more powerful organizations
+such as governments or criminal organizations, who have the necessary resources to carry
+out such attacks.
+
+% -- TODO: Talk about perhaps the structure of the feistel and how it negatively
+% -- affects the sec?
+
+% -- Clean up numbers in this document. It should be consistent. Somtimes you use
+% 'seven' other times its '7' and others still it's '$7$'!!
 
 %--ECC--
 \section{ECC - Elliptic Curve Cryptography}
