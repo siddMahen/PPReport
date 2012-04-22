@@ -16,4 +16,10 @@
 \contentsline {subsection}{\numberline {2.2}Linear Cryptanalysis}{10}
 \contentsline {subsection}{\numberline {2.3}Cryptanalysis of the GHOST Cipher}{11}
 \contentsline {subsection}{\numberline {2.4}Advantages and Disadvantages of the GHOST Cipher}{15}
-\contentsline {section}{\numberline {3}ECC - Elliptic Curve Cryptography}{15}
+\contentsline {section}{\numberline {3}Public-Key Ciphers}{15}
+\contentsline {subsection}{\numberline {3.1}Elliptic Curves}{16}
+\contentsline {subsubsection}{\numberline {3.1.1}Addition Over Elliptic Curves}{17}
+\contentsline {subsubsection}{\numberline {3.1.2}Elliptic Curves Over Finite Fields}{18}
+\contentsline {subsubsection}{\numberline {3.1.3}Elliptic Curve Discrete Logarithm Problem}{18}
+\contentsline {subsection}{\numberline {3.2}Elliptic ElGamel}{19}
+\contentsline {subsection}{\numberline {3.3}Cryptanalysis of the ElGamel Cipher}{19}

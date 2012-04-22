@@ -10,6 +10,7 @@
 \usepackage{algorithm}
 \usepackage{mathabx}
 \usepackage{multirow}
+\usepackage{dsfont}
 
 \begin{document}
 
@@ -211,8 +212,6 @@ This can be more concisely explained in pseudocode as:
 \end{algorithmic}
 \caption{Caesar cipher}
 \end{algorithm}
-
-% -- Show pseudo code here
 
 \subsection{Information Theory and Languages}
 
@@ -751,6 +750,204 @@ out such attacks.
 % 'seven' other times its '7' and others still it's '$7$'!!
 
 %--ECC--
-\section{ECC - Elliptic Curve Cryptography}
+%\section{ECC - Elliptic Curve Cryptography}
+\section{Public-Key Ciphers}
+
+So far, we have only examined a subset of ciphers called symmetric-key
+ciphers. These ciphers require both Alice and Bob to know a shared secret key
+before they can be used and any secure communications can occur.
+
+However, there exist also a set of ciphers which do not require Alice and Bob
+to know a shared secret key prior to communication. These types of ciphers
+are called public-key ciphers.
+
+Public-key ciphers usually function using two keys, a public key, $K_{pub}$,
+and a private key $K_{pri}$. Alice sends Bob her private key $K_{pub}$ over
+a public channel. Bob then encryptes his message using Alice's private key
+and sends this encrypted message to her. Alice then decryptes the message
+using her private key, $K_{pri}$.
+
+The security of these kinds of ciphers assumes two key things. Firstly, that
+it is very difficult to decrypt Bob's encrypted message without Alice's
+private key, and secondly, it is very difficult to retrieve Alice's private
+key from her public key.
+
+Unlike symmetric-key ciphers which usually use information theoretic methods
+to achieve security, public-key ciphers are based on the intractability of
+certain mathematical problems, and hence use computational complexity theoretic
+methods to achieve security. Basically, this means that they rely on the
+assumption that certain mathematical problems have no efficient solution
+and leverage that to build strong ciphers.
+
+The cipher we will be examining is a type of public-key cipher, called
+the elliptic ElGamel cipher. It is based on the difficulty of the
+elliptic curve discrete logarithm problem. Before we can cryptanalyse this
+cipher, we will need to cover a little elliptic curve theory.
+
+% TODO: Clarify efficient here
+
+%Because Alice and Bob never have to exchange secret information prior to the
+%exchange of messages, these kinds of ciphers work quite nicely in environments
+%where Alice and Bob may be unable to communicate before hand, or they may not
+%have access to other mechanisms of securely sending communications.
+\subsection{Elliptic Curves}
+
+Before we can properly describe the cipher we will be analyzing, a little elliptic
+curve theory is in order.
+
+Elliptic curves are a special kind of equation whose set of solutions have interesting
+properties.
+
+For our purposes, an elliptic curve can be defined as the set of solutions
+to the equation:
+\begin{align*}
+    E:Y^2 = X^3 + AX + B
+\end{align*}
+Along with the point at infinity $\mathcal{O}$. $\mathcal{O}$ is a special
+point which we pretend lies on every vertical line. Note that the curves
+we will be investigating must also satisfy
+\begin{align*}
+    4A^3 + 27B^2 \neq 0
+\end{align*}
+To ensure that the curve is non-singular.
+
+% -- TODO: Add footnote to tell the reader that non-singular curves are not
+% -- as easy to add/ addition does not always work there
+
+\subsubsection{Addition Over Elliptic Curves}
+
+What makes these curves special is that there is a natural way of ``adding''
+two points on this curve which always results in a third point which is also on
+the curve! The elliptic curve addition algorithm is as follows:
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+    \Ensure $E \leftarrow Y^2 = X^3 + AX + B \textbf{ and } 4A^3 + 27B^2 \neq 0$
+    \Require $P_1, P_2 \leftarrow \text{some points on E}$
+    \If {$P_1 = \mathcal{O}$}
+        \Return $P_1 + P_2 = P_1$
+    \Else
+        \State $P_1 = (x_1, y_1)$
+        \State $P_2 = (x_2, y_2)$
+        \If {$x_1 = x_1 \textbf{ and } y_1 = -y_2$}
+            \Return $P_1 + P_2 = \mathcal{O}$
+        \Else
+            \State $\lambda \leftarrow \left\{
+                \begin{array}{l l}
+                    \dfrac{y_2 - y_1}{x_2 - x_1} & \quad \text{if $P_1 \neq P_2$}\\\\
+                    \dfrac{3x_1^2 + A}{2y_1} & \quad \text{if $P_1 = P_2$}\\
+                \end{array}
+                \right.$
+            \State $x_3 \leftarrow \lambda^2 - x_1 - x_2$
+            \State $y_3 \leftarrow \lambda(x_1 - x_3) - y_1$
+            \State $P_3 = (x_3, y_3)$
+            \Return $P_1 + P_2 = P_3$
+        \EndIf
+    \EndIf
+\end{algorithmic}
+\caption{Elliptic curve addition algorithm}
+\end{algorithm}
+
+For example, consider the elliptic curve $E: Y^2 = X^3 + 8X + 4$, and the
+points $P_1 = (4, 10), P_2 = (5, 13)$, both of which are on the curve.
+
+If we add the two points together using the algorithm above,
+\begin{align*}
+    \lambda = \frac{13 - 10}{5 - 4} &= 3\\
+    x_3 = 3^2 - 4 - 5 &= 0\\
+    y_3 = 3(4) - 10 &= 2\\
+    P_1 + P_2 &= (0, 2)
+\end{align*}
+We obtain the point $P_3 = (0, 2)$, which is also a solution to $E$!
+\begin{align*}
+    2^2 = 0^3 + 8(0) + 4
+\end{align*}
+
+\subsubsection{Elliptic Curves Over Finite Fields}
+
+To allow for us to work with elliptic curves in a cryptographic
+context we need to extend our definition of elliptic curves to
+include elliptic curves over finite fields. This will allow
+us to define the mathematically intractable problem which defines
+the security of this cipher.
+
+Simply, we defined elliptic curves whose points have coordinates
+in the finite field (``over'' the finite field) $\mathds{F}_p$, with
+the equation
+\begin{align*}
+    E:Y^2 = X^3 + AX + B \text{ with } A, B \in \mathds{F}_p \text{ satisfiying }
+    4A^3 + 27B^2 \neq 0
+\end{align*}
+where $p$ is some prime number larger than 3. The points on $E$ with
+coordinates in $\mathds{F}_p$ are denoted by
+\begin{align*}
+    E(\mathds{F}_p) = \{ (x, y): x, y \in \mathds{F}_p \text{ and } y^2 = x^3 + Ax + B \} \cup \{ \mathcal{O} \}
+\end{align*}
+
+The same addition rule we previously defined works here as well, however,
+because all operations are now in the field $\mathds{F}_p$, the addition
+of two points will always yield another point inside $\mathds{F}_p$! This
+sort of cyclic property is what this cipher exploits to ensure its
+security.
+
+For example, consider the addition of the points $P_1 = (0, 2), P_2 = (4, 10)$ on the
+elliptic curve $E:Y^2 = X^3 + 8X + 4$ over the finite field $\mathds{F}_11$.
+\begin{align*}
+    \lambda = \frac{10 - 2}{4 - 0} &= 2 \pmod{11}\\
+    x_3 = 2^2 - 0 - 4 &= 0 \pmod{11}\\
+    y_3 = 2(0) - 2 &= 9 \pmod{11}\\
+    P_1 + P_2 &= (0, 9)
+\end{align*}
+Although it may not seem obvious,
+\begin{align*}
+    9^2 &\equiv 0^3 + 8(0) + 4 \pmod{11}\\
+    81 &\equiv 4 \pmod{11}
+\end{align*}
+The point $(0, 9)$ is indeed a solutioni to $E$ in the field $\mathds{F}_11$.
+
+\subsubsection{Elliptic Curve Discrete Logarithm Problem}
+
+As we mentioned earlier, the elliptic curve discrete logarithm problem (ECDLP),
+is the underlying hard problem upon which ElGamel is based.
+
+The ECDLP is the problem of finding and integer $n$ such that
+$Q = nP$, where $P, Q \in E(\mathds{F}_p)$ and the multiplication of $n$ and
+$P$ is defined as:
+\begin{align*}
+    \underbrace{P + P + P + \cdots + P}_{\text{$n$ additions over $E$}} = nP = Q
+\end{align*}
+
+Althougth this may seem simple, remember that the addition occuring over the
+curve $E$ more complex than normal addition, and that it is being done in the
+field $\mathds{F}_p$.
+
+A key point to notice here is that if there exists one $n$ then there must,
+through the cyclic nature of the addition rule, be an infinite number of
+$n$ which also solve $Q = nP$. As we shall soon see, this can be exploited
+to find $n$.
+
+\subsection{Elliptic ElGamel}
+
+Now that we have an understanding of the mathematics behind elliptic curves and
+the ECDLP, we can describe the ElGamel cipher in its entirety.
+
+ElGamel works as follows. A large prime $p$, an elliptic curve $E$ over
+$\mathds{F}_p$ and a point $P \in E(\mathds{F}_p)$ are chosen by a trusted
+party. Alice then chooses a private key, $n_A$, and computes $Q_A = n_AP$
+in $E(\mathds{F}_p)$. She then published $Q_A$ as her public key. If Bob
+wants to send a message to Alice, he chooses a plaintext $M \in E(\mathds{F}_p)$
+and a temporary key $k$. He then computes $C_1 = kP$ and $C_2 = M + kQ_A$
+in $E(\mathds{F}_p)$ and sends $(C_1, C_2)$ to Alice. Alice then computes
+$C_2 - n_AC_1$ in $E(\mathds{F}_p)$ to obtain $M$, given that:
+\begin{align*}
+    C_2 - n_AC_1 = (M + kQ_A) - n_A(kP) = M + k(n_AP) - n_A(kP) = M
+\end{align*}
+
+\subsection{Cryptanalysis of the ElGamel Cipher}
+
+We know that if we solve the underlying hard problem of the ElGamel cipher
+namely, ECDLP, then we can quite easily break the entire cipher. However,
+if we had to check every single value of $n$ until we find a match, which
+in the worst case, would be unfeasible.
 
 \end{document}
