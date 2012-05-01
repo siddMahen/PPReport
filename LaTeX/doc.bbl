@@ -1,0 +1,29 @@
+\begin{thebibliography}{1}
+
+\bibitem{nsa}
+National~Security Agency.
+\newblock {{The Case for Elliptic Curve Cryptography}}.
+\newblock \url{http://1.usa.gov/IaIdvX}, 2009.
+
+\bibitem{lincrypt}
+Howard~M. Heys.
+\newblock {{A Tutorial on Linear and Differential Cryptanalysis}}.
+\newblock {\em Cryptologia}, XXVI(3):189--221, 2002.
+
+\bibitem{silverman}
+Jeffrey Hoffstein, Jill Pipher, and Joseph~H. Silverman.
+\newblock {\em {{An Introduction to Mathematical Cryptography}}}.
+\newblock Springer, 233 Spring Street, New York, N.Y., USA, 2008.
+
+\bibitem{musson}
+Matthew Musson.
+\newblock {{Attacking the Elliptic Curve Discrete Logarithm Problem}}.
+\newblock Master's thesis, Acadia University, 2006.
+
+\bibitem{schneier}
+Bruce Schneier.
+\newblock {\em {{Applied Cryptography}}}.
+\newblock John Wiley \& Sons, Inc., 605 Third Avenue, New York, N.Y., USA,
+  second edition, 1996.
+
+\end{thebibliography}

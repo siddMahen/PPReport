@@ -7,8 +7,12 @@ Note that this is not my reflection report, but rather my "product".
 
 ## Requirements
 
-To render this document, a LaTeX software package is required. This
-document was rendered on my machine using MacTeX (available
+To render this document, a LaTeX software package as well as the
+following non-standard LaTeX packages are required:
+
+* [`minted`](http://minted.googlecode.com/files/minted-v1.7.zip)
+
+This document was rendered on my machine using MacTeX (available
 [here](http://www.tug.org/mactex/2011/)).
 
 ## Compiling and Rendering
