@@ -577,14 +577,8 @@ different S-box for each round. At each iteration of the Feistel network, the
 the first S-box, and so forth. Finally, these chunks are concatenated and
 circularly left shifted 11 bits.
 
-To illustra
-
-During the round, the subkey corresponding
-to that round is XOR'd with the input and that is then circularly left shifted
-11 bits.
-
 Each S-box is a $4 \times 4$ S-box, meaning it accepts $4$ input bits and $4$
-output bits. The first S-box, for example looks like this:
+output bits. See Figure \ref{fig:sbox} for an example of such an S-box.
 \begin{figure}[h]
 \begin{center}
 \begin{tabular}{l*{16}{c}}
@@ -595,7 +589,8 @@ Ouput (hex) & 4 & A & 9 & 2 & D & 8 & 0 & E & 6 & B & 1 & C & 7 & F & 5 & 3\\
 \bottomrule
 \end{tabular}
 \end{center}
-\caption{Substitution Box 1}
+\caption{First substitution box of GHOST}
+\label{fig:sbox}
 \end{figure}
 
 To figure out which linear expressions (if any) have high or low biases, we need
